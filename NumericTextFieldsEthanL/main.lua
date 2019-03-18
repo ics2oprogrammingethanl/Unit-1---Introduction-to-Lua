@@ -55,12 +55,9 @@ end
 local function NumericFieldListener( event )
 
 	-- User begins editing "numericField"
-	if ( event.phase == "began" ) then
+	if (event.phase == "began") then
 
-		-- clear text field
-		event.target.text = ""
-
-	elseif event.phase == "submitted" then
+	elseif (event.phase == "submitted") then
 
 		-- when the answer is submitted (enter key is pressed) set user input to user's answer
 		userAnswer = tonumber(event.target.text)
@@ -76,6 +73,9 @@ local function NumericFieldListener( event )
 			correctObject.isVisible = false
 			timer.performWithDelay(3000, HideIncorrect)
 		end
+		-- clear text field
+		event.target.text = ""
+
 	end
 end
 
