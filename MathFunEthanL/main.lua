@@ -9,7 +9,7 @@
 display.setStatusBar(display.HiddenStatusBar)
 
 -- sets the background colour
-display.setDefault("background", 255/255, 0, 255/255)
+display.setDefault("background", 255/255, 125/255, 0/255)
 
 ---------------------------------------------------------------------------------------
 -- LOCAL VARIABLES
@@ -30,6 +30,9 @@ local randomOperator
 -----------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
 -----------------------------------------------------------------------------------
+local function roundToFirstDecimal( tmpcorrectAnswer )
+	return math.round( tmpcorrectAnswer * 10) * 0.1
+end
 
 local function AskQuestion()
 
@@ -37,8 +40,8 @@ local function AskQuestion()
 	randomOperator = math.random(1, 4)
 
 	-- generate 2 random numbers between a max. and a min. number
-	randomNumber1 = math.random(0, 10)
-	randomNumber2 = math.random(0, 10)
+	randomNumber1 = math.random(6, 10)
+	randomNumber2 = math.random(1, 6)
 
 	-- if the random operator is 1, then do addition
 	if (randomOperator == 1) then
@@ -71,12 +74,10 @@ local function AskQuestion()
 	elseif (randomOperator == 4) then
 
 		-- calculate the correct answer
-		correctAnswer = randomNumber1 / randomNumber2
+		correctAnswer = roundToFirstDecimal(randomNumber1 / randomNumber2)
 
 		-- create question in text object
 		questionObject.text = randomNumber1 .. " / " .. randomNumber2 .. " = "
-
-		math.round(correctAnswer)
 
 	end
 end
@@ -124,7 +125,7 @@ end
 
 -- displays a question and sets the colour
 questionObject = display.newText( "", 300, display.contentHeight/5, nil, 80)
-questionObject:setTextColor(124/255, 233/255, 0/255)
+questionObject:setTextColor(255/255, 255/255, 255/255)
 
 -- create the correct text object and make it invisible
 correctObject = display.newText( "Correct!", display.contentWidth/2, display.contentHeight*2/3, nil, 50 )
@@ -133,7 +134,7 @@ correctObject.isVisible = false
 
 -- Create numeric field
 numericField = native.newTextField( 650, display.contentHeight/5, 300, 100 )
-numericField.inputType = "phone"
+numericField.inputType = "decimal"
 
 -- add the event listener for the numeric field
 numericField:addEventListener( "userInput", NumericFieldListener )
