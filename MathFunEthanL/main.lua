@@ -26,6 +26,10 @@ local userAnswer
 local correctAnswer
 local incorrectAnswer
 local randomOperator
+local correctSound = audio.loadSound( "Sounds/Cash Register Cha Ching.mp3" )
+local incorrectSound = audio.loadSound( "Sounds/SpringSoundEffect.mp3" )
+local correctSoundChannel
+local incorrectSoundChannel
 
 -----------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
@@ -107,11 +111,15 @@ local function NumericFieldListener( event )
 				incorrectObject.isVisible = false
 				correctObject.isVisible = true
 				timer.performWithDelay(3000, HideCorrect)
+
+				correctSoundChannel = audio.play(correctSound)
 			
 		elseif (userAnswer ~= correctAnswer) then
 			incorrectObject.isVisible = true
 			correctObject.isVisible = false
 			timer.performWithDelay(3000, HideIncorrect)
+
+			incorrectSoundChannel = audio.play(incorrectSound)
 		end
 		-- clear text field
 		event.target.text = ""

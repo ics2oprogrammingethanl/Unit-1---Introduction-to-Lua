@@ -21,6 +21,19 @@ local beetleship = display.newImageRect("Images/beetleship.png", 200, 200)
 -- set the image to be transparent
 beetleship.alpha = 0
 
+-- create sound
+local backgroundMusic = audio.loadSound( "Sounds/bkgMusic.mp3" )
+local backgroundMusicChannel
+
+local function playSound( event )
+
+	if (beetleship.alpha == 0) then
+		backgroundMusicChannel = audio.play(backgroundMusic)
+	end
+end
+
+Runtime:addEventListener("enterFrame", playSound)
+
 -- set the initial x and y position of beetleship
 beetleship.x = 1^3
 beetleship.y = (display.contentHeight/3)
