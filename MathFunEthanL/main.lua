@@ -31,9 +31,22 @@ local incorrectSound = audio.loadSound( "Sounds/SpringSoundEffect.mp3" )
 local correctSoundChannel
 local incorrectSoundChannel
 
------------------------------------------------------------------------------------
+-- variables for the timer
+local totalSeconds = 5
+local secondsLeft = 5
+local clockText
+local countDownTimer
+
+local lives = 3
+local heart1
+local heart2
+local pointsObject
+local deathSound = audio.loadSound("Sounds/DeathSound.mp3")
+local deathSoundChannel
+
+---------------------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 local function roundToFirstDecimal( tmpcorrectAnswer )
 	return math.round( tmpcorrectAnswer * 10) * 0.1
 end
@@ -86,6 +99,30 @@ local function AskQuestion()
 	end
 end
 
+local function UpdateTime()
+
+	-- decrement the number of seconds
+	secondsLeft = secondsLeft - 1
+
+	-- display the number of seconds left in the clock object
+	clockText.text = secondsLeft .. ""
+
+	if (secondsLeft == 0 ) then
+		-- reset the number of seconds left
+		secondsLeft = totalSeconds
+		lives = lives - 1
+
+		elseif (lives == 0) then
+			audio.play(deathSound)
+	end
+
+end
+-- function that calls the timer
+local function StartTimer()
+	-- create a countdown timer that loops infinitely
+	countDownTimer = timer.performWithDelay( 1000, UpdateTime, 0)
+end
+
 local function HideCorrect()
 	correctObject.isVisible = false
 	AskQuestion()
@@ -118,9 +155,23 @@ local function NumericFieldListener( event )
 			incorrectObject.isVisible = true
 			correctObject.isVisible = false
 			timer.performWithDelay(3000, HideIncorrect)
-
-			incorrectSoundChannel = audio.play(incorrectSound)
+			lives = lives - 1
+			incorrectSoundChannel = audio.play(deathSound)
+			elseif (lives == 0) then
+				incorrectSoundChannel = false
+			deathSoundChannel = audio.play(deathSound)
 		end
+
+		if (lives == 2) then
+			heart3.isVisible = false
+			elseif (lives == 1) then
+				heart2.isVisible = false
+				elseif (lives == 0) then
+					heart1.isVisible = false
+					deathSoundChannel = audio.play(deathSound)
+
+					end
+
 		-- clear text field
 		event.target.text = ""
 
@@ -131,8 +182,22 @@ end
 -- OBJECT CREATION
 ---------------------------------------------------------------------------------
 
+-- create the lives to display on the screen
+heart1 = display.newImageRect("Images/heart.png", 100, 100)
+heart1.x = display.contentWidth * 5 / 8
+heart1.y = display.contentHeight * 1 / 7
+
+heart2 = display.newImageRect("Images/heart.png", 100, 100)
+heart2.x = display.contentWidth * 6 / 8
+heart2.y = display.contentHeight * 1 / 7
+
+-- create the lives to display on the screen
+heart3 = display.newImageRect("Images/heart.png", 100, 100)
+heart3.x = display.contentWidth * 7 / 8
+heart3.y = display.contentHeight * 1 / 7
+
 -- displays a question and sets the colour
-questionObject = display.newText( "", 300, display.contentHeight/5, nil, 80)
+questionObject = display.newText( "", 300, display.contentHeight/3, nil, 80)
 questionObject:setTextColor(255/255, 255/255, 255/255)
 
 -- create the correct text object and make it invisible
@@ -141,7 +206,7 @@ correctObject:setTextColor(0/255, 211/255, 198/255)
 correctObject.isVisible = false
 
 -- Create numeric field
-numericField = native.newTextField( 650, display.contentHeight/5, 300, 100 )
+numericField = native.newTextField( 650, display.contentHeight/3, 300, 100 )
 numericField.inputType = "decimal"
 
 -- add the event listener for the numeric field
