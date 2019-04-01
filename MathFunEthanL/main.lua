@@ -34,22 +34,23 @@ local incorrectSoundChannel
 -- variables for the timer
 local totalSeconds = 5
 local secondsLeft = 5
-local clockText
 local clockText = display.newText("", display.contentWidth/8, display.contentHeight/8, nil, 50)
 local countDownTimer
 
 local lives = 3
 local heart1
 local heart2
+local heart3
 local pointsObject
 local deathSound = audio.loadSound("Sounds/DeathSound.mp3")
 local deathSoundChannel
 
-local heart3
 local pointsObject
 local deathSound = audio.loadSound("Sounds/Minecraft-death-sound.mp3")
 local deathSoundChannel
-local gameOverScreen = display.newImageRect("Images/gameOver.png", display.contentCenterX, display.contentCenterY)
+local gameOverScreen = display.newImageRect("Images/gameOver.png", 1024, 768)
+gameOverScreen.x = display.contentWidth/2
+gameOverScreen.y = display.contentHeight/2
 gameOverScreen.isVisible = false
 ---------------------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
@@ -116,7 +117,7 @@ local function UpdateTime()
  if (secondsLeft == 0 ) then
   -- reset the number of seconds left
   secondsLeft = totalSeconds
-  lives = lives - 1
+	lives = lives - 1
 
   	if (lives == 2) then
 	heart3.isVisible = false
@@ -130,11 +131,13 @@ local function UpdateTime()
 	heart1.isVisible = false
 	deathSoundChannel = audio.play(deathSound)
 	timer.cancel(countDownTimer)
-
+	gameOverScreen.isVisible = true
+	numericField.isVisible = false
+	questionObject.isVisible = false
 		end
 	end
 end
-
+UpdateTime()
 -- function that calls the timer
 local function StartTimer()
  -- create a countdown timer that loops infinitely
@@ -182,32 +185,10 @@ local function NumericFieldListener( event )
 	timer.pause(countDownTimer)
 	incorrectSoundChannel = audio.play(incorrectSound)
 	timer.performWithDelay(2560, KeepTime)
+	elseif (lives == 0) then
+	incorrectSoundChannel = false
+	deathSoundChannel = audio.play(deathSound)
 	end
-	correctSoundChannel = audio.play(correctSound)
-			
-		elseif (userAnswer ~= correctAnswer) then
-			incorrectObject.isVisible = true
-			correctObject.isVisible = false
-			timer.performWithDelay(3000, HideIncorrect)
-			lives = lives - 1
-			incorrectSoundChannel = audio.play(deathSound)
-			elseif (lives == 0) then
-			incorrectSoundChannel = false
-			deathSoundChannel = audio.play(deathSound)
-		end
-
-		if (lives == 2) then
-			heart3.isVisible = false
-			elseif (lives == 1) then
-				heart2.isVisible = false
-				elseif (lives == 0) then
-					heart1.isVisible = false
-					deathSoundChannel = audio.play(deathSound)
-
-					end
-
-		-- clear text field
-		event.target.text = ""
 
 	if (lives == 2) then
 	heart3.isVisible = false
@@ -219,6 +200,10 @@ local function NumericFieldListener( event )
 	incorrectSoundChannel = audio.stop(incorrectSoundChannel)
 	timer.cancel(countDownTimer)
 	gameOverScreen.isVisible = true
+	numericField.isVisible = false
+	questionObject.isVisible = false
+	correctObject.isVisible = false
+	incorrectObject.isVisible = false
 	end
 
 	-- clear text field
