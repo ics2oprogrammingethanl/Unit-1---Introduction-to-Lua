@@ -35,6 +35,7 @@ local incorrectSoundChannel
 local totalSeconds = 5
 local secondsLeft = 5
 local clockText
+local clockText = display.newText("", display.contentWidth/8, display.contentHeight/8, nil, 50)
 local countDownTimer
 
 local lives = 3
@@ -44,112 +45,145 @@ local pointsObject
 local deathSound = audio.loadSound("Sounds/DeathSound.mp3")
 local deathSoundChannel
 
+local heart3
+local pointsObject
+local deathSound = audio.loadSound("Sounds/Minecraft-death-sound.mp3")
+local deathSoundChannel
+local gameOverScreen = display.newImageRect("Images/gameOver.png", display.contentCenterX, display.contentCenterY)
+gameOverScreen.isVisible = false
 ---------------------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
 -------------------------------------------------------------------------------------
 local function roundToFirstDecimal( tmpcorrectAnswer )
-	return math.round( tmpcorrectAnswer * 10) * 0.1
+  return math.round( tmpcorrectAnswer * 10) * 0.1
 end
 
 local function AskQuestion()
 
-	-- generates a number between 1 and 2, 1 being addition, 2 being subtraction
-	randomOperator = math.random(1, 4)
+ -- generates a number between 1 and 2, 1 being addition, 2 being subtraction
+ randomOperator = math.random(1, 4)
 
-	-- generate 2 random numbers between a max. and a min. number
-	randomNumber1 = math.random(6, 10)
-	randomNumber2 = math.random(1, 6)
+ -- generate 2 random numbers between a max. and a min. number
+ randomNumber1 = math.random(6, 10)
+ randomNumber2 = math.random(1, 6)
 
-	-- if the random operator is 1, then do addition
-	if (randomOperator == 1) then
+ -- if the random operator is 1, then do addition
+ if (randomOperator == 1) then
 
-		-- calculate the correct answer
-		correctAnswer = randomNumber1 + randomNumber2
+  -- calculate the correct answer
+  correctAnswer = randomNumber1 + randomNumber2
 
-	-- create question in text object
-	questionObject.text = randomNumber1 .. " + " .. randomNumber2 .. " = "
+ -- create question in text object
+ questionObject.text = randomNumber1 .. " + " .. randomNumber2 .. " = "
 
-	-- otherwise, if the random operator is 2, do subtraction
-	elseif (randomOperator == 2) then
+ -- otherwise, if the random operator is 2, do subtraction
+ elseif (randomOperator == 2) then
 
-		-- calculate the correct answer
-		correctAnswer = randomNumber1 - randomNumber2
+  -- calculate the correct answer
+  correctAnswer = randomNumber1 - randomNumber2
 
-		-- create question in text object
-		questionObject.text = randomNumber1 .. " - " .. randomNumber2 .. " = "
+  -- create question in text object
+  questionObject.text = randomNumber1 .. " - " .. randomNumber2 .. " = "
 
-		-- otherwise, if the random operator is 3, do multiplication
-	elseif (randomOperator == 3) then
+  -- otherwise, if the random operator is 3, do multiplication
+ elseif (randomOperator == 3) then
 
-		-- calculate the correct answer
-		correctAnswer = randomNumber1 * randomNumber2
+  -- calculate the correct answer
+  correctAnswer = randomNumber1 * randomNumber2
 
-		-- create question in text object
-		questionObject.text = randomNumber1 .. " * " .. randomNumber2 .. " = "
+  -- create question in text object
+  questionObject.text = randomNumber1 .. " * " .. randomNumber2 .. " = "
 
-		-- otherwise, if the random operator is 4, do division
-	elseif (randomOperator == 4) then
+  -- otherwise, if the random operator is 4, do division
+ elseif (randomOperator == 4) then
 
-		-- calculate the correct answer
-		correctAnswer = roundToFirstDecimal(randomNumber1 / randomNumber2)
+  -- calculate the correct answer
+  correctAnswer = roundToFirstDecimal(randomNumber1 / randomNumber2)
 
-		-- create question in text object
-		questionObject.text = randomNumber1 .. " / " .. randomNumber2 .. " = "
-
+  -- create question in text object
+  questionObject.text = randomNumber1 .. " / " .. randomNumber2 .. " = "
 	end
 end
 
 local function UpdateTime()
 
-	-- decrement the number of seconds
-	secondsLeft = secondsLeft - 1
+ -- decrement the number of seconds
+ secondsLeft = secondsLeft - 1
 
-	-- display the number of seconds left in the clock object
-	clockText.text = secondsLeft .. ""
+ -- display the number of seconds left in the clock object
+ clockText.text = secondsLeft .. ""
 
-	if (secondsLeft == 0 ) then
-		-- reset the number of seconds left
-		secondsLeft = totalSeconds
-		lives = lives - 1
+ if (secondsLeft == 0 ) then
+  -- reset the number of seconds left
+  secondsLeft = totalSeconds
+  lives = lives - 1
 
-		elseif (lives == 0) then
-			audio.play(deathSound)
+  	if (lives == 2) then
+	heart3.isVisible = false
+	incorrectSoundChannel = audio.play(incorrectSound)
+	AskQuestion()
+	elseif (lives == 1) then
+	heart2.isVisible = false
+	incorrectSoundChannel = audio.play(incorrectSound)
+	AskQuestion()
+	elseif (lives == 0) then
+	heart1.isVisible = false
+	deathSoundChannel = audio.play(deathSound)
+	timer.cancel(countDownTimer)
+
+		end
 	end
-
 end
+
 -- function that calls the timer
 local function StartTimer()
-	-- create a countdown timer that loops infinitely
-	countDownTimer = timer.performWithDelay( 1000, UpdateTime, 0)
+ -- create a countdown timer that loops infinitely
+ countDownTimer = timer.performWithDelay( 1000, UpdateTime, 0)
+end
+
+local function KeepTime()
+	timer.resume(countDownTimer)
+	secondsLeft = 5
 end
 
 local function HideCorrect()
-	correctObject.isVisible = false
-	AskQuestion()
+ correctObject.isVisible = false
+ AskQuestion()
 end
 
 local function HideIncorrect()
-	incorrectObject.isVisible = false
-	AskQuestion()
+ incorrectObject.isVisible = false
+ AskQuestion()
 end
 
 local function NumericFieldListener( event )
 
-	-- User begins editing "numericField"
-	if (event.phase == "began") then
+ -- User begins editing "numericField"
+ if (event.phase == "began") then
 
-	elseif (event.phase == "submitted") then
+ elseif (event.phase == "submitted") then
 
-		-- when the answer is submitted (enter key is pressed) set user input to user's answer
-		userAnswer = tonumber(event.target.text)
+	-- when the answer is submitted (enter key is pressed) set user input to user's answer
+	userAnswer = tonumber(event.target.text)
+	-- if the users answer and the correct answer are the same:
+	if (userAnswer == correctAnswer) then
+	incorrectObject.isVisible = false
+	correctObject.isVisible = true
+	timer.performWithDelay(3000, HideCorrect)
+    correctSoundChannel = audio.play(correctSound)
+    timer.pause(countDownTimer)
+    timer.performWithDelay(2560, KeepTime)
 
-		-- if the users answer and the correct answer are the same:
-		if (userAnswer == correctAnswer) then
-				incorrectObject.isVisible = false
-				correctObject.isVisible = true
-				timer.performWithDelay(3000, HideCorrect)
-
-				correctSoundChannel = audio.play(correctSound)
+	elseif (userAnswer ~= correctAnswer) then
+	incorrectObject.isVisible = true
+	correctObject.isVisible = false
+	timer.performWithDelay(3000, HideIncorrect)
+	lives = lives - 1
+	timer.pause(countDownTimer)
+	incorrectSoundChannel = audio.play(incorrectSound)
+	timer.performWithDelay(2560, KeepTime)
+	end
+	correctSoundChannel = audio.play(correctSound)
 			
 		elseif (userAnswer ~= correctAnswer) then
 			incorrectObject.isVisible = true
@@ -158,7 +192,7 @@ local function NumericFieldListener( event )
 			lives = lives - 1
 			incorrectSoundChannel = audio.play(deathSound)
 			elseif (lives == 0) then
-				incorrectSoundChannel = false
+			incorrectSoundChannel = false
 			deathSoundChannel = audio.play(deathSound)
 		end
 
@@ -174,6 +208,21 @@ local function NumericFieldListener( event )
 
 		-- clear text field
 		event.target.text = ""
+
+	if (lives == 2) then
+	heart3.isVisible = false
+	elseif (lives == 1) then
+	heart2.isVisible = false
+	elseif (lives == 0) then
+	heart1.isVisible = false
+	deathSoundChannel = audio.play(deathSound)
+	incorrectSoundChannel = audio.stop(incorrectSoundChannel)
+	timer.cancel(countDownTimer)
+	gameOverScreen.isVisible = true
+	end
+
+	-- clear text field
+	event.target.text = ""
 
 	end
 end
@@ -222,3 +271,4 @@ incorrectObject.isVisible = false
 
 -- call the function to ask the question
 AskQuestion()
+StartTimer()
