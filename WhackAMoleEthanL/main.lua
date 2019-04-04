@@ -2,7 +2,7 @@
 -- Title: WhackAMole
 -- Name: Ethan L.
 -- Course: ICS2O/3C
--- This program places a random object on the screen. IIf the user clicks on it in time,
+-- This program places a random object on the screen. If the user clicks on it in time,
 -- the score increases by 1.
 -----------------------------------------------------------------------------------------
 
